@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const passport = require("passport");
 
 const User = require("../models/User");
 
@@ -10,38 +11,17 @@ router.get("/signup", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-  res.render("auth/login");
+  res.render("auth/login", { errorMessage: req.flash("error") });
 });
 
-router.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  // const username = req.body.username;
-  // const password = req.body.password;
-
-  if (!username || !password) {
-    res.render("auth/login", { errorMessage: "Both fields are required" });
-
-    return;
-  }
-
-  User.findOne({ username })
-    .then(user => {
-      if (!user) {
-        return res.render("auth/login", {
-          errorMessage: "Invalid credentials"
-        });
-      }
-      if (bcrypt.compareSync(password, user.password)) {
-        req.session.user = user;
-        res.redirect("/");
-      } else {
-        res.render("auth/login", { errorMessage: "Invalid credentials" });
-      }
-    })
-    .catch(err => {
-      res.render("views/signup", { errorMessage: err._message });
-    });
-});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/login",
+    failureFlash: true
+  })
+);
 
 router.post("/signup", (req, res) => {
   const { username, password } = req.body;
@@ -83,10 +63,8 @@ router.post("/signup", (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-  req.session.destroy(err => {
-    if (err) console.log(err);
-    res.redirect("/");
-  });
+  req.logout();
+  res.redirect("/");
 });
 
 module.exports = router;

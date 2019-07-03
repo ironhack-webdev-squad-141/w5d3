@@ -8,12 +8,13 @@ router.get("/", (req, res, next) => {
 
 const loginCheck = () => {
   return (req, res, next) => {
-    if (req.session.user) next();
+    if (req.isAuthenticated()) next();
     else res.redirect("/login");
   };
 };
 
 router.get("/secret", loginCheck(), (req, res) => {
+  console.log("secret: ", req.session);
   res.render("secret");
 });
 
