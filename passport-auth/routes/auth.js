@@ -6,6 +6,16 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+router.get("/github", passport.authenticate("github"));
+
+router.get(
+  "/auth/github/callback",
+  passport.authenticate("github", {
+    successRedirect: "/",
+    failureRedirect: "/login"
+  })
+);
+
 router.get("/signup", (req, res) => {
   res.render("auth/signup");
 });

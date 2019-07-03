@@ -11,6 +11,7 @@ const path = require("path");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const GitHubStrategy = require("passport-github").Strategy;
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const flash = require("connect-flash");
@@ -77,6 +78,29 @@ passport.use(
         done(err);
       });
   })
+);
+
+passport.use(
+  new GitHubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/github/callback"
+    },
+    (accessToken, refreshToken, profile, done) => {
+      User.findOne({ githubId: profile.id })
+        .then(user => {
+          if (user) return done(null, user);
+
+          return User.create({ githubId: profile.id }).then(newUser => {
+            return done(null, newUser);
+          });
+        })
+        .catch(err => {
+          done(err);
+        });
+    }
+  )
 );
 
 app.use(passport.initialize());
