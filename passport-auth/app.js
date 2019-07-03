@@ -12,6 +12,8 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const GitHubStrategy = require("passport-github").Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
+
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const flash = require("connect-flash");
@@ -103,6 +105,33 @@ passport.use(
   )
 );
 
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/facebook/callback"
+    },
+    (accessToken, refreshToken, profile, done) => {
+      // console.log(profile)
+      User.findOne({ facebookId: profile.id })
+        .then(user => {
+          if (user) return done(null, user);
+
+          return User.create({
+            facebookId: profile.id,
+            fullName: profile.displayName
+          }).then(newUser => {
+            return done(null, newUser);
+          });
+        })
+        .catch(err => {
+          done(err);
+        });
+    }
+  )
+);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -127,6 +156,7 @@ app.locals.title = "Express - Generated with IronGenerator";
 const index = require("./routes/index");
 app.use("/", index);
 
+app.use("/protected", require("./routes/protected"));
 app.use("/", require("./routes/auth"));
 
 module.exports = app;

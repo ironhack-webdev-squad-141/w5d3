@@ -1,0 +1,15 @@
+<h2>Profile</h2>
+{{#if user.facebookId}}
+<p>Facebook Id: {{user.facebookId}}</p>
+{{/if}}
+{{#if user.githubId}}
+<p>github Id: {{user.githubId}}</p>
+{{/if}}
+
+{{#each rooms}}
+<div>
+    <h4><a href="/protected/rooms/{{_id}}">{{name}}</a>
+        <p>{{price}}</p>
+    </h4>
+</div>
+{{/each}}

@@ -3,16 +3,21 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   username: {
-    type: String,
+    type: String
     // required: true,
-    unique: true
+    // unique: true
   },
   password: {
     type: String
     // required: true
   },
+  fullName: String,
   githubId: String,
-  facebookId: String
+  facebookId: String,
+  role: {
+    type: String,
+    enum: ["user", "moderator"]
+  }
 });
 
 const User = mongoose.model("User", userSchema);

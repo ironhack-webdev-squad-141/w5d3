@@ -6,11 +6,34 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+router.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
+});
+
+router.use((req, res, next) => {
+  if (req.user) {
+    res.redirect("/");
+  } else {
+    next();
+  }
+});
+
 router.get("/github", passport.authenticate("github"));
 
 router.get(
   "/auth/github/callback",
   passport.authenticate("github", {
+    successRedirect: "/",
+    failureRedirect: "/login"
+  })
+);
+
+router.get("/facebook", passport.authenticate("facebook"));
+
+router.get(
+  "/auth/facebook/callback",
+  passport.authenticate("facebook", {
     successRedirect: "/",
     failureRedirect: "/login"
   })
@@ -70,11 +93,6 @@ router.post("/signup", (req, res) => {
     .catch(err => {
       res.render("views/signup", { errorMessage: err._message });
     });
-});
-
-router.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
 });
 
 module.exports = router;

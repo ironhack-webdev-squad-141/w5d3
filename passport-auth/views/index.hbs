@@ -1,8 +1,13 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
 <div>
+    {{#if user}}
+    <a href="/protected/secret">Secret Page</a>
+    <a href="/protected/profile">Profile</a>
+    <a href="/protected/rooms">Rooms</a>
+    <a href="/logout">Logout</a>
+    {{else}}
     <a href="/signup">Register</a>
     <a href="/login">Login</a>
-    <a href="/secret">Secret Page</a>
-    <a href="/logout">Logout</a>
+    {{/if}}
 </div>
